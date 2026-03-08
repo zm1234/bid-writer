@@ -1,9 +1,10 @@
 /**
- * Bid Writer 工作流 - 多轮审查版本
- * 运行完整流程：PRD → 规则 → 草稿(v1) → 审核 → 格式校验 → 终稿
+ * Bid Writer 工作流 - 完整版（含DOCX生成）
+ * 运行完整流程：PRD → 规则 → 草稿 → 审核 → 格式校验 → 终稿 → DOCX
  */
 
 const { WorkflowEngine } = require('./packages/workflow/src/engine-v2');
+const { generateDocx } = require('./scripts/docx-generator');
 
 // ============== PRD 数据 ==============
 
@@ -76,6 +77,14 @@ async function main() {
   
   // 7. 生成终稿 (Agent 6)
   const final = await engine.generateFinal(PRD_DATA, draft, review, format);
+  
+  // 8. 生成 DOCX
+  if (final) {
+    console.log('\n[Agent 7] 生成 DOCX...');
+    const outputDir = './data/projects/2026-beijing-integrative-medicine/outputs';
+    const docxPath = `${outputDir}/标书终稿-工作流生成.docx`;
+    await generateDocx(draft.sections, docxPath);
+  }
   
   if (final) {
     console.log('');
