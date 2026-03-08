@@ -19,5 +19,9 @@
   "packageManager": "pnpm@8.15.0",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "docx": "^9.6.0",
+    "pizzip": "^3.2.0"
   }
 }
