@@ -1,0 +1,167 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============== 项目 ==============
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  status    String   @default("created")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联
+  prd          PRD?
+  rulePlan     RulePlan?
+  draft        Draft?
+  reviews      ReviewResult[]
+  final        FinalDocument?
+  feedbacks    Feedback[]
+}
+
+// ============== PRD ==============
+model PRD {
+  id                String   @id @default(cuid())
+  projectId         String   @unique
+  title             String
+  background        String
+  researchProblem   String
+  researchObjectives String   // JSON array
+  expectedOutcomes  String   // JSON array
+  timeline         String?
+  budget           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ============== 规则规划 ==============
+model RulePlan {
+  id              String   @id @default(cuid())
+  projectId       String   @unique
+  absoluteRules   String   // JSON array
+  styleProfile    String   // JSON object
+  writingGuidelines String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ============== 草稿 ==============
+model Draft {
+  id            String   @id @default(cuid())
+  projectId     String   @unique
+  sections      String   // JSON array
+  totalWordCount Int      @default(0)
+  status        String   @default("drafting")
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ============== 审核结果 ==============
+model ReviewResult {
+  id              String   @id @default(cuid())
+  projectId       String
+  round           Int
+  status          String
+  issues          String   // JSON array
+  summary         String
+  approved        Boolean  @default(false)
+  reviewerComment String?
+  createdAt       DateTime @default(now())
+
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ============== 终稿 ==============
+model FinalDocument {
+  id           String   @id @default(cuid())
+  projectId    String   @unique
+  title        String
+  fullText     String
+  wordCount    Int
+  sections     String   // JSON array
+  readingGuide String   // JSON object
+  summary      String
+  createdAt    DateTime @default(now())
+
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ============== 用户反馈 ==============
+model Feedback {
+  id           String   @id @default(cuid())
+  projectId    String
+  type         String
+  content      String
+  agentType    String
+  incorporated Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ============== 风格历史 ==============
+model StyleHistory {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime @default(now())
+  formality    Int?
+  academicDepth Int?
+  verbosity    Int?
+  notes        String?
+}
+
+// ============== 收集的信息 ==============
+model CollectedInfo {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  content     String   // Markdown 格式
+  
+  // 来源
+  sourceName  String
+  sourceUrl   String?
+  sourceType  String   // official, academic, search, user_provided
+  
+  // 可信度
+  trustLevel  String   @default("L2")  // L0, L1, L2
+  trustNote   String?
+  
+  // 元数据
+  tags        String   // JSON array
+  collectedAt DateTime @default(now())
+  
+  // 用户反馈
+  userConfirmed   Boolean  @default(false)
+  userCorrected   String?
+  userNote        String?
+  confirmedAt     DateTime?
+
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ============== 模板 ==============
+model Template {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String?
+  filePath    String?
+  sections    String   // JSON array - 章节结构
+  style       String?  // JSON object - 格式样式
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
