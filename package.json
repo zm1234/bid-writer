@@ -21,8 +21,10 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@prisma/client": "^7.4.2",
     "adm-zip": "^0.5.16",
     "docx": "^9.6.0",
-    "pizzip": "^3.2.0"
+    "pizzip": "^3.2.0",
+    "prisma": "^7.4.2"
   }
 }
