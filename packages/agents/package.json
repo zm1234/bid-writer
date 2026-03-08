@@ -5,20 +5,13 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./base": "./src/base.ts",
-    "./prd-confirm": "./src/agents/prd-confirm.ts",
-    "./rule-planner": "./src/agents/rule-planner.ts",
-    "./draft-writer": "./src/agents/draft-writer.ts",
-    "./draft-reviewer": "./src/agents/draft-reviewer.ts",
-    "./final-confirmer": "./src/agents/final-confirmer.ts"
+    "./base": "./src/base.ts"
   },
   "scripts": {
     "build": "tsc",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@bid-writer/shared": "workspace:*",
-    "@bid-writer/database": "workspace:*",
     "zod": "^3.22.4"
   },
   "devDependencies": {
