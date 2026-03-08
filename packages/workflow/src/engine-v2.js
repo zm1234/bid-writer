@@ -114,15 +114,10 @@ function saveFinal(data) {
     JSON.stringify(data, null, 2)
   );
   
-  // 保存 Markdown
-  let fullText = '';
-  data.sections.forEach(s => {
-    fullText += `## ${s.title}\n\n${s.content}\n\n`;
-  });
-  
+  // 保存 Markdown - 使用 fullText
   fs.writeFileSync(
     path.join(OUTPUTS_DIR, 'final-draft.md'),
-    `# ${data.title}\n\n${fullText}`
+    `# ${data.title}\n\n${data.fullText}`
   );
   
   console.log(`  ✅ 终稿已保存到 outputs/`);
