@@ -83,7 +83,33 @@ async function main() {
     console.log('\n[Agent 7] 生成 DOCX...');
     const outputDir = './data/projects/2026-beijing-integrative-medicine/outputs';
     const docxPath = `${outputDir}/标书终稿-工作流生成.docx`;
-    await generateDocx(draft.sections, docxPath);
+    
+    // 使用新的 DOCX 填充器
+    const { fillDocxTemplate } = require('./scripts/docx-filler');
+    await fillDocxTemplate(draft.sections, docxPath);
+    
+    // 验证 DOCX 是否正确填充
+    console.log('\n[Agent 8] 验证 DOCX...');
+    const fs = require('fs');
+    const AdmZip = require('adm-zip');
+    
+    // 检查 DOCX 文件
+    if (fs.existsSync(docxPath)) {
+      const stats = fs.statSync(docxPath);
+      console.log(`  - DOCX 文件大小: ${stats.size} bytes`);
+      
+      // 检查是否生成了内容文本
+      const textPath = docxPath.replace('.docx', '-内容.txt');
+      if (fs.existsSync(textPath)) {
+        const textStats = fs.statSync(textPath);
+        console.log(`  - 内容文本大小: ${textStats.size} bytes`);
+        console.log(`  ✅ 验证通过`);
+      } else {
+        console.log(`  ⚠️ 内容文本未生成（模板结构复杂）`);
+      }
+    } else {
+      console.log(`  ❌ DOCX 文件未生成`);
+    }
   }
   
   if (final) {
